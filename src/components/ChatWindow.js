@@ -1,6 +1,5 @@
 import React from "react";
 import UserChatInput from './UserChatInput';
-import ChatMessage from './ChatMessage';
 import {connect} from "react-redux";
 import {fetchChat,addNewMessage} from '../actions/actions'
 import { withRouter } from "react-router-dom";
@@ -8,36 +7,23 @@ import ChatHistory from "./ChatHistory";
 
 const URL = "wss://echo.websocket.org/"
 class ChatWindow extends React.Component{
- 
  state={
-      name:"Shilpi",
-    // messages:[]
+      username:this.props.location.email
     }
-  
   ws = new WebSocket(URL);
   componentDidMount() {
     this.ws.onopen = () => {
       // on connecting, do nothing but log it to the console
-      console.log('connected');
-      this.props.fetchChat(this.state.name);
+      this.props.fetchChat(this.state.username);
 
       
     }
 
     this.ws.onmessage = evt => {
-      console.log("data",evt.data, this.props);
       // on receiving a message, add it to the list of messages
       // const message = evt.data;
       const messageReceived = {name: 'Bot', message: evt.data};
       this.handleAddMessages(messageReceived)
-    //   let chat;
-    //   console.log(this.props.fetchChatHistory[this.state.name]);
-    // if(this.props.fetchChatHistory[this.state.name]) {
-    //   chat = this.props.fetchChatHistory[this.state.name].chat.concat(messageReceived);
-    // } else {
-    //   chat = [messageReceived];
-    // }
-    // this.props.addNewMessage({name: this.state.name, chat });  
   }
 
     this.ws.onclose = () => {
@@ -48,20 +34,15 @@ class ChatWindow extends React.Component{
       })
     }
   }
-  handleChange = (e)=>(
-      this.setState({name:e.target.value})
-  )
+ 
   handleAddMessages = (newMessage)=>{
-    console.log("NEwmessage",newMessage, this.props.fetchChatHistory[this.state.name]);
     let chat;
-    // this.setState((state)=>({messages:[...state.messages, newMessage]}))
-    if(this.props.fetchChatHistory[this.state.name]) {
-      chat = this.props.fetchChatHistory[this.state.name].concat(newMessage);
+    if(this.props.fetchChatHistory[this.state.username]) {
+      chat = this.props.fetchChatHistory[this.state.username].concat(newMessage);
     } else {
       chat = [newMessage];
     }
-    // this.handleAddMessages(messageSent);
-    this.props.addNewMessage({ [this.state.name]: chat });
+    this.props.addNewMessage({...this.props.fetchChatHistory, [this.state.username]: chat });
 
   }
 
@@ -70,45 +51,24 @@ class ChatWindow extends React.Component{
   }
 
   handleSubmitMessage = (sentMessage) => {
-    console.log("handle");
     //onsubmitting the form send the message and add it to messages list and reset the input
     this.ws.send(sentMessage);
-    const messageSent = {name: this.state.name, message: sentMessage};
-    let chat;
-    if(this.props.fetchChatHistory[this.state.name]) {
-      chat = this.props.fetchChatHistory[this.state.name].concat(messageSent);
-    } else {
-      chat = [messageSent];
-    }
-    // this.handleAddMessages(messageSent);
-    this.props.addNewMessage({ [this.state.name]: chat });
+    const messageSent = {name: this.state.username, message: sentMessage};
+    this.handleAddMessages(messageSent);
   }
 
   render(){
-    console.log("props",this.props.fetchChatHistory, this.state);
     return (
-      <div> 
-        <label>Name:</label>
-        <input 
-          type="text"
-          value={this.state.name}
-          onChange={this.handleChange}
-          placeholder="Enter Your Name"
-        />  
+        <div className="chat-container">
+          <button type="button" onClick={this.handleSignOut} className="btn btn-secondary sign-out-btn">Sign Out</button>
+        <div className="col-sm-8 chat"> 
         <UserChatInput
           onSubmitMessage={(messages)=>this.handleSubmitMessage(messages)}
-         />
-         {/* {this.state.messages.map((item,index)=>
-          <ChatMessage
-            key={index}
-            name={item.name}
-            message = {item.message}
-          />,
-        )} */}
-          {(this.props.fetchChatHistory.Shilpi && this.props.fetchChatHistory.Shilpi.length>0)
-            ? <ChatHistory {...this.props}/> : null }
-        <button type="button" onClick={this.handleSignOut}>Sign Out</button>
-      </div>  
+          />
+        {(this.props.fetchChatHistory[this.state.username] && this.props.fetchChatHistory[this.state.username].length>0)
+          ? <ChatHistory  {...this.props} /> : null }
+        </div> 
+        </div>
     )
   }
 }

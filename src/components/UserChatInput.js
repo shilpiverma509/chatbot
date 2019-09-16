@@ -23,19 +23,28 @@ class UserChatInput extends React.Component{
     this.setState({message:""})
   }
   render(){
+    const isMessageValid=this.state.message && this.state.message !==" " && this.state.message.length>0;
     return(
-      <div className="container">
       <form onSubmit={this.handleSubmit}>
-        <input
-          type="text"
-          placeholder="Enter your message"
-          value={this.state.message}
-          onChange={this.handleChange}
-          />
-        <button type="submit">Send</button>
+      <div>
+        <div className="input-group mb-3">
+          <input
+            type="text"
+            placeholder="Enter your message"
+            value={this.state.message}
+            onChange={this.handleChange}
+            className="form-control" aria-label="username chat" aria-describedby="basic-addon2"
+            />
+            {isMessageValid ?
+              <button className="btn btn-outline-primary chat-submit-btn"type="submit">Send</button>
+            :
+              <button className="btn btn-outline-primary chat-submit-btn"type="submit" disabled>Send</button>
+            }
+          </div>
+        </div>
+
       </form>
 
-      </div>
     )
   }
 }

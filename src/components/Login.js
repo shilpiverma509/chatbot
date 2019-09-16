@@ -11,26 +11,32 @@ class Login extends React.Component{
   }
  handleSubmit(e) {
    e.preventDefault();
-   this.props.history.push("/home")
+   this.props.history.push({pathname:"/home",email:this.state.email});
  }
   handleInputChange = (e)=>(
     this.setState({[e.target.name]:e.target.value})
   )
 
     render(){
-      console.log("hey", this.props);
         return (
           <div className="container">
-            <form onSubmit={this.handleSubmit} className="input-form">
-              <div>
-                  <label className="input-email">Enter Email: </label>
-                  <input type="email" name="email" value={this.state.email} onChange={this.handleInputChange} placeholder="Email" required  />
+          <h1 className="login-page">Login Page</h1>
+            <form onSubmit={this.handleSubmit}>
+              <div className="form-group row">
+                  <label className="col-sm-2 col-form-label">Enter Email: </label>
+                  <div className="col-sm-8">
+                    <input className="form-control" type="email" name="email" value={this.state.email} onChange={this.handleInputChange} placeholder="Email" required  />
+                  </div>
               </div>
-              <div>
-                <label className="input-password">Enter Password: </label>
-                <input type="password" name="password" value={this.state.value} onChange={this.handleInputChange} placeholder="password" required/>
-              </div>  
-                <button type="submit" className="btn-submit">Login</button>
+                <div className="form-group row">
+                  <label className="col-sm-2 col-form-label">Enter Password: </label>
+                  <div className="col-sm-8">
+                    <input className="form-control" type="password" name="password" value={this.state.value} onChange={this.handleInputChange} placeholder="password" required/>
+                  </div>
+                </div>
+                <div className="text-center">
+                <button type="submit" className="btn btn-primary mb-2">Login</button>
+                </div>
               </form>
             </div>
         )
