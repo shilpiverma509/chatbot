@@ -4,16 +4,14 @@ import ChatMessage from './ChatMessage';
 import {connect} from "react-redux";
 import {fetchChat,addNewMessage} from '../actions/actions'
 import { withRouter } from "react-router-dom";
-
-
-
+import ChatHistory from "./ChatHistory";
 
 const URL = "wss://echo.websocket.org/"
 class ChatWindow extends React.Component{
  
  state={
       name:"Shilpi",
-    messages:[]
+    // messages:[]
     }
   
   ws = new WebSocket(URL);
@@ -21,17 +19,26 @@ class ChatWindow extends React.Component{
     this.ws.onopen = () => {
       // on connecting, do nothing but log it to the console
       console.log('connected');
-    this.props.fetchChat(this.state.name);
+      this.props.fetchChat(this.state.name);
+
       
     }
 
     this.ws.onmessage = evt => {
-      console.log("data",evt.data)
+      console.log("data",evt.data, this.props);
       // on receiving a message, add it to the list of messages
       // const message = evt.data;
       const messageReceived = {name: 'Bot', message: evt.data};
       this.handleAddMessages(messageReceived)
-    }
+    //   let chat;
+    //   console.log(this.props.fetchChatHistory[this.state.name]);
+    // if(this.props.fetchChatHistory[this.state.name]) {
+    //   chat = this.props.fetchChatHistory[this.state.name].chat.concat(messageReceived);
+    // } else {
+    //   chat = [messageReceived];
+    // }
+    // this.props.addNewMessage({name: this.state.name, chat });  
+  }
 
     this.ws.onclose = () => {
       console.log('disconnected')
@@ -45,16 +52,21 @@ class ChatWindow extends React.Component{
       this.setState({name:e.target.value})
   )
   handleAddMessages = (newMessage)=>{
-    console.log("NEWM",newMessage)
-    this.setState((state)=>({messages:[...state.messages, newMessage]}))
-    console.log("message",this.state.message)
+    console.log("NEwmessage",newMessage, this.props.fetchChatHistory[this.state.name]);
+    let chat;
+    // this.setState((state)=>({messages:[...state.messages, newMessage]}))
+    if(this.props.fetchChatHistory[this.state.name]) {
+      chat = this.props.fetchChatHistory[this.state.name].concat(newMessage);
+    } else {
+      chat = [newMessage];
+    }
+    // this.handleAddMessages(messageSent);
+    this.props.addNewMessage({ [this.state.name]: chat });
+
   }
 
   handleSignOut= (e)=>{
-    // this.props.history.push("/");
-    window.location.pathname ="/";
-
-    console.log(this.props.fetchChatHistory);
+    this.props.history.push("/");
   }
 
   handleSubmitMessage = (sentMessage) => {
@@ -62,12 +74,18 @@ class ChatWindow extends React.Component{
     //onsubmitting the form send the message and add it to messages list and reset the input
     this.ws.send(sentMessage);
     const messageSent = {name: this.state.name, message: sentMessage};
-    this.handleAddMessages(messageSent);
-    this.props.addNewMessage({name:this.state.name, messages: this.state.messages});  
+    let chat;
+    if(this.props.fetchChatHistory[this.state.name]) {
+      chat = this.props.fetchChatHistory[this.state.name].concat(messageSent);
+    } else {
+      chat = [messageSent];
+    }
+    // this.handleAddMessages(messageSent);
+    this.props.addNewMessage({ [this.state.name]: chat });
   }
 
   render(){
-    console.log("props",this.props);
+    console.log("props",this.props.fetchChatHistory, this.state);
     return (
       <div> 
         <label>Name:</label>
@@ -80,13 +98,15 @@ class ChatWindow extends React.Component{
         <UserChatInput
           onSubmitMessage={(messages)=>this.handleSubmitMessage(messages)}
          />
-         {this.state.messages.map((item,index)=>
+         {/* {this.state.messages.map((item,index)=>
           <ChatMessage
             key={index}
             name={item.name}
             message = {item.message}
           />,
-        )}
+        )} */}
+          {(this.props.fetchChatHistory.Shilpi && this.props.fetchChatHistory.Shilpi.length>0)
+            ? <ChatHistory {...this.props}/> : null }
         <button type="button" onClick={this.handleSignOut}>Sign Out</button>
       </div>  
     )
@@ -102,4 +122,4 @@ const mapDispatchToProps = {
   addNewMessage
 }
 
-export default connect(mapStateToProps,mapDispatchToProps)(ChatWindow);
+export default  withRouter(connect(mapStateToProps,mapDispatchToProps)(ChatWindow));

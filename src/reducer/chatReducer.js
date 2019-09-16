@@ -5,10 +5,8 @@ export default function (state={},action){
     case FETCH_CHAT:
       return state;
     case ADD_MESSAGE:
-      return{
-        ...state,
-        [action.payload.name]: action.payload.messages
-      };
+      return action.payload;
+        // [action.payload.name]: action.payload.messages
     default:
       return state;
   }

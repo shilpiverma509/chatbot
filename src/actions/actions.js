@@ -9,6 +9,7 @@ export function fetchChat(data){
 }
 
 export function addNewMessage(data){
+  console.log("äction",data)
   return {
     type:ADD_MESSAGE,
     payload:data

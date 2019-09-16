@@ -19,7 +19,6 @@ class UserChatInput extends React.Component{
 
   handleSubmit(e){
     e.preventDefault();
-    console.log(this.state.message)
     this.props.onSubmitMessage(this.state.message)
     this.setState({message:""})
   }
@@ -41,7 +40,7 @@ class UserChatInput extends React.Component{
   }
 }
 
-UserChatInput.PropTypes = {
+UserChatInput.propTypes = {
   onSubmitMessage: PropTypes.func.isRequired
 }
 
